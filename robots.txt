@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://dognine410.github.io/xiaonai-agent/sitemap.xml

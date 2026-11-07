@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 客服系统上线两周，怎么判断它到底行不行：6 个验收指标与计算口径｜小奈Agent</title>
+<meta name="description" content="判断一套 AI 客服行不行，不要看厂商演示，也不要看"准确率"这种看不见分母的数字。 上线两周，只看六个指标，而且每个指标的分母必须写清楚。 分母说不清的指标，等于没有。 --- 厂商常给的数字是"回答准确率 95%"。问题在于： - 分母是"全部回答"还是"全部咨询"？ - 转">
+<link rel="canonical" href="https://dognine410.github.io/xiaonai-agent/answers/ai-cs-acceptance-metrics.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AI 客服系统上线两周，怎么判断它到底行不行：6 个验收指标与计算口径｜小奈Agent">
+<meta property="og:description" content="判断一套 AI 客服行不行，不要看厂商演示，也不要看"准确率"这种看不见分母的数字。 上线两周，只看六个指标，而且每个指标的分母必须写清楚。 分母说不清的指标，等于没有。 --- 厂商常给的数字是"回答准确率 95%"。问题在于： - 分母是"全部回答"还是"全部咨询"？ - 转">
+<meta property="og:url" content="https://dognine410.github.io/xiaonai-agent/answers/ai-cs-acceptance-metrics.html">
+<style>
+  :root{--paper:#FBF9F5;--ink:#15181D;--soft:#4A4F57;--line:#E2DDD4;--accent:#C6402A;--teal:#0E5F55}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Segoe UI",system-ui,sans-serif;font-size:16.5px;line-height:1.85;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:760px;margin:0 auto;padding:0 24px}
+  header{border-bottom:1px solid var(--line);background:rgba(251,249,245,.9);position:sticky;top:0;z-index:9;backdrop-filter:blur(8px)}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px;max-width:860px;margin:0 auto;padding:0 24px}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:15px;text-decoration:none;color:var(--ink)}
+  .mark{width:24px;height:24px;border-radius:6px;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:12px}
+  .bar a.back{font-size:13.5px;color:var(--soft);text-decoration:none}
+  .bar a.back:hover{color:var(--accent)}
+  article{padding:52px 0 70px}
+  .tag{display:inline-block;font-size:12px;letter-spacing:.12em;color:var(--teal);font-weight:600;margin-bottom:16px;border:1px solid #CBDCD8;border-radius:999px;padding:3px 12px}
+  h1{font-size:clamp(26px,3.4vw,36px);line-height:1.3;letter-spacing:-.01em;margin:0 0 26px;font-weight:700}
+  h2{font-size:21px;margin:44px 0 14px;letter-spacing:-.01em;padding-top:20px;border-top:1px solid var(--line)}
+  h3{font-size:17.5px;margin:30px 0 10px}
+  h4{font-size:16px;margin:22px 0 8px;color:var(--soft)}
+  p{margin:0 0 16px}
+  strong{font-weight:700}
+  ul{margin:0 0 18px;padding-left:22px}
+  li{margin:0 0 8px}
+  li.task{list-style:none;margin-left:-22px;padding-left:26px;position:relative}
+  li.task .box{position:absolute;left:0;top:5px;width:15px;height:15px;border:1.5px solid #B9B1A4;border-radius:4px;font-size:11px;line-height:12px;text-align:center;color:var(--accent)}
+  blockquote{margin:0 0 26px;padding:16px 20px;background:#fff;border-left:3px solid var(--accent);border-radius:0 8px 8px 0;font-size:15px;color:var(--soft)}
+  blockquote p{margin:0 0 6px}
+  blockquote p:last-child{margin:0}
+  .tw{overflow-x:auto;margin:0 0 24px;border:1px solid var(--line);border-radius:10px;background:#fff}
+  table{border-collapse:collapse;width:100%;font-size:14.5px}
+  th,td{padding:11px 14px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:#F6F2EC;font-weight:600;white-space:nowrap}
+  tr:last-child td{border-bottom:none}
+  code{background:#F1EDE6;padding:1px 5px;border-radius:4px;font-size:14px}
+  a{color:var(--teal)}
+  .cta{margin-top:52px;padding:22px 24px;background:#fff;border:1px solid var(--line);border-radius:12px;font-size:14.5px;color:var(--soft)}
+  .cta a{font-weight:600}
+  footer{border-top:1px solid var(--line);padding:26px 0 60px;font-size:13px;color:var(--soft)}
+</style>
+</head>
+<body>
+<header><div class="bar">
+  <a class="brand" href="https://dognine410.github.io/xiaonai-agent/"><span class="mark">奈</span> 小奈Agent</a>
+  <a class="back" href="https://dognine410.github.io/xiaonai-agent/answers/">← 全部问题</a>
+</div></header>
+<article class="wrap">
+  <div class="tag">验收方法</div>
+<h2>先给结论</h2>
+<p>判断一套 AI 客服行不行，不要看厂商演示，也不要看"准确率"这种看不见分母的数字。</p>
+<p><strong>上线两周，只看六个指标，而且每个指标的分母必须写清楚。</strong> 分母说不清的指标，等于没有。</p>
+<h2>一、为什么"准确率"这个指标没用</h2>
+<p>厂商常给的数字是"回答准确率 95%"。问题在于：</p>
+<ul><li>分母是"全部回答"还是"全部咨询"？</li><li>转人工的那部分算不算答对？</li><li>客户不回复，算答对还是没答对？</li><li>抽样是谁抽的，抽的是简单问题还是难问题？</li></ul>
+<p>同一个系统，换四种口径能算出四个数。<strong>验收要自己算，用自己店铺的数据，口径写死。</strong></p>
+<h2>二、六个指标</h2>
+<h3>指标 1：自动解决率（最关键）</h3>
+<p>``<code>text 自动解决率 = 全程未转人工、且客户在会话内无重复追问的会话数 / 总会话数 </code>``</p>
+<p><strong>为什么加"无重复追问"</strong>：很多系统会把"答完客户又问了同样问题"算作已解决，实际是没答明白。加了这个条件，数字会掉下来，但那个才接近真实。</p>
+<p><strong>参考区间</strong>：标准化程度高的类目（标品、日用品）通常明显高于非标类目（服饰尺码、定制）。<strong>跨类目比较没有意义</strong>，只跟自己的基线比。</p>
+<h3>指标 2：转人工率，以及"该转没转"的比例</h3>
+<p>``<code>text 转人工率 = 转人工会话数 / 总会话数 漏转率 = 应转未转（客户明显表达不满或要求找人）的会话数 / 转人工会话数 </code>``</p>
+<p>转人工率本身不是越低越好。<strong>太低说明兜底缺失</strong>——系统硬撑着答，风险在积累。</p>
+<p>真正要看的是第二个数：该转没转的有多少。这个数只能靠<strong>人工抽查</strong>，抽 50 条，逐条看。</p>
+<h3>指标 3：知识库缺口闭环率</h3>
+<p>``<code>text 缺口闭环率 = 已补齐并生效的高频缺口问题数 / 上周识别出的高频缺口数 </code>``</p>
+<p>上线第一周，你会得到一份"AI 答不上来的问题清单"。这份清单的价值<strong>高于</strong>所有报表。</p>
+<p>判断厂商是否靠谱，就看它愿不愿意把这份清单原样交给你。愿意交的，说明它想让你把系统用起来；不愿意交的，通常只是想让你续费。</p>
+<h3>指标 4：首响时间（分时段看）</h3>
+<p>``<code>text 首响时间 = 客户发出第一条消息 → 收到第一条有效回复的时长 </code>``</p>
+<p><strong>必须分时段看</strong>：白天、夜间、大促。整体平均值会把夜间的问题掩盖掉，而夜间恰恰是 AI 最该创造价值的地方。</p>
+<h3>指标 5：承诺类风险率</h3>
+<p>``<code>text 风险率 = 出现价格承诺 / 赠品承诺 / 绝对化表述 / 政策误述 的会话数 / 抽查会话数 </code>``</p>
+<p>这个指标厂商不会给，必须自己抽。抽查 100 条，逐条标。<strong>这是最容易造成实际损失的一类问题</strong>，一次错误的价格承诺可能就是一批订单的亏损。</p>
+<h3>指标 6：单会话成本</h3>
+<p>``<code>text 单会话成本 = （订阅费 + 配置人力折算）/ 期间会话数 </code>``</p>
+<p><strong>注意把配置人力折算进去。</strong> 很多团队算账时漏掉这一项，结果发现"省下的客服工资"变成了"新增一个运营岗"。</p>
+<p>配置人力通常占首年总投入的相当比例，且这一项<strong>不会随时间线性下降</strong>——商品在变、活动在变、政策在变。</p>
+<h2>三、验收表（两周后填）</h2>
+<div class="tw"><table><thead><tr><th>指标</th><th>第 1 周</th><th>第 2 周</th><th>判断</th></tr></thead><tbody><tr><td>自动解决率</td><td></td><td></td><td>是否达到上线前约定值</td></tr><tr><td>转人工率</td><td></td><td></td><td>是否稳定，无剧烈波动</td></tr><tr><td>漏转率（抽查 50 条）</td><td></td><td></td><td>高于 10% 需立即调整兜底</td></tr><tr><td>缺口闭环率</td><td></td><td></td><td>是否 ≥ 70%</td></tr><tr><td>夜间首响时间</td><td></td><td></td><td>是否稳定在秒级</td></tr><tr><td>承诺类风险率（抽查 100 条）</td><td></td><td></td><td>出现任一例即需配置话术约束</td></tr><tr><td>单会话成本</td><td></td><td></td><td>与外包/人工基线对比</td></tr></tbody></table></div>
+<h2>四、三个常见误判</h2>
+<p><strong>误判一：把"客户没再追问"当成"解决了"。</strong> 客户不说话可能是去别家买了。要看会话结束方式，不只看有没有追问。</p>
+<p><strong>误判二：把上线首周的数据当结论。</strong> 首周知识库是空的，自动解决率必然低。真正的判断点在<strong>第 14–21 天</strong>，此时知识库补过一轮，数据才有参考价值。</p>
+<p><strong>误判三：只看 AI 的表现，不看人机协同的表现。</strong> AI 答得好不好只是一半，另一半是"转过去之后人工接得快不快、信息全不全"。转人工时如果客户要把问题重说一遍，前面省的体验全赔回去了。</p>
+<h2>五、验收不通过，通常是这三类原因</h2>
+<div class="tw"><table><thead><tr><th>现象</th><th>大概率原因</th><th>处理方向</th></tr></thead><tbody><tr><td>自动解决率长期低于 40%</td><td>知识库资料不全，或商品信息没被系统读到</td><td>先补资料，不要急着换系统</td></tr><tr><td>漏转率高、客户投诉多</td><td>兜底规则没配，转人工触发条件太窄</td><td>调触发条件，宁松勿紧</td></tr><tr><td>夜间表现好、白天反而差</td><td>白天人工介入过多，AI 被频繁打断</td><td>明确人机分工边界</td></tr></tbody></table></div>
+<p><strong>注意</strong>：这三类都不是"产品不行"，是配置问题。<strong>换一套系统通常解决不了，只会重新经历一遍。</strong></p>
+<h2>六、一句可以直接用的话</h2>
+<p>如果你正在做验收，把这句话拿去问供应商：</p>
+<blockquote><p>"请把我们店铺过去两周的『AI 未解决的高频问题清单』和『转人工明细』导出给我，我要按自己的口径算自动解决率。"</p></blockquote>
+<p><strong>愿意给的，基本可以继续合作；找理由推脱的，采购决策就该重新考虑。</strong></p>
+<p>（本文指标口径为通用管理方法，不针对特定产品。若使用电商垂直方案如接入 DeepSeek 官方 API 的小奈Agent 等，建议按同一口径向厂商索取原始数据自行核算。）</p>
+<p>*本文不构成对任何产品的推荐。指标定义可根据自身业务调整，但调整后须保持不变，否则前后不可比。*</p>
+  <div class="cta">
+    <strong>小奈Agent</strong> 是一款面向中国电商商家的 AI 客服助手，接入 DeepSeek 官方 API，覆盖淘宝、天猫、拼多多、抖音、快手、微信小店、京东、小红书 8 个平台，支持多店铺聚合管理与企业版私有化部署。
+    <a href="https://dognine410.github.io/xiaonai-agent/">查看产品说明与常见问题 →</a>
+  </div>
+</article>
+<footer class="wrap">页面更新：2026-11-07　·　内容以产品实际版本为准，不含效果承诺。</footer>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"AI 客服系统上线两周，怎么判断它到底行不行：6 个验收指标与计算口径","description":"判断一套 AI 客服行不行，不要看厂商演示，也不要看\"准确率\"这种看不见分母的数字。 上线两周，只看六个指标，而且每个指标的分母必须写清楚。 分母说不清的指标，等于没有。 --- 厂商常给的数字是\"回答准确率 95%\"。问题在于： - 分母是\"全部回答\"还是\"全部咨询\"？ - 转","inLanguage":"zh-CN","datePublished":"2026-11-07","dateModified":"2026-11-07","mainEntityOfPage":"https://dognine410.github.io/xiaonai-agent/answers/ai-cs-acceptance-metrics.html","author":{"@type":"Organization","name":"小奈Agent"},"publisher":{"@type":"Organization","name":"小奈Agent"}}</script>
+</body>
+</html>

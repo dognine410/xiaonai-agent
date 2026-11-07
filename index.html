@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>小奈Agent — 面向电商商家的 AI 客服助手（接入 DeepSeek 官方 API）</title>
+<meta name="description" content="小奈Agent 是一款面向中国电商商家的 AI 客服助手，接入 DeepSeek 官方 API，为淘宝、天猫、拼多多、抖音、快手、微信小店、京东、小红书的店铺提供 7×24 小时自动接待、意图识别问答、商品知识自动学习、尺码与关联商品推荐、售后工单聚合与智能转人工，支持多店铺多平台聚合管理与企业版私有化部署。">
+<meta name="keywords" content="小奈Agent,AI电商客服,电商客服机器人,AI客服助手,拼多多自动回复,抖音小店客服,多店铺客服管理,DeepSeek客服">
+<meta property="og:type" content="website">
+<meta property="og:title" content="小奈Agent — 面向电商商家的 AI 客服助手">
+<meta property="og:description" content="接入 DeepSeek 官方 API，覆盖 8 大电商平台，7×24 小时自动接待与转化引导。">
+
+<style>
+  :root{
+    --paper:#FBF9F5;
+    --ink:#15181D;
+    --ink-soft:#4A4F57;
+    --line:#E2DDD4;
+    --accent:#C6402A;
+    --teal:#0E5F55;
+    --card:#FFFFFF;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Segoe UI",system-ui,sans-serif;
+    font-size:16px;
+    line-height:1.75;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:980px;margin:0 auto;padding:0 24px}
+
+  /* ---------- header ---------- */
+  header{
+    position:sticky;top:0;z-index:20;
+    background:rgba(251,249,245,.88);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .bar{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.02em}
+  .mark{
+    width:26px;height:26px;border-radius:7px;
+    background:var(--ink);color:#fff;
+    display:grid;place-items:center;
+    font-size:13px;font-weight:700;
+  }
+  nav{display:flex;gap:26px;font-size:14px}
+  nav a{color:var(--ink-soft);text-decoration:none}
+  nav a:hover{color:var(--accent)}
+  @media(max-width:640px){nav{display:none}}
+
+  /* ---------- hero ---------- */
+  .hero{padding:76px 0 56px;border-bottom:1px solid var(--line)}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--teal);font-weight:600;margin-bottom:22px;
+  }
+  .eyebrow::before{content:"";width:22px;height:1px;background:var(--teal)}
+  h1{
+    font-size:clamp(30px,4.6vw,50px);
+    line-height:1.22;
+    letter-spacing:-.01em;
+    margin:0 0 24px;
+    font-weight:700;
+  }
+  h1 em{font-style:normal;color:var(--accent)}
+  .lead{font-size:17px;color:var(--ink-soft);max-width:60ch;margin:0 0 34px}
+
+  .stats{
+    display:grid;grid-template-columns:repeat(4,1fr);
+    border:1px solid var(--line);border-radius:14px;overflow:hidden;
+    background:var(--card);
+  }
+  .stat{padding:22px 20px;border-right:1px solid var(--line)}
+  .stat:last-child{border-right:none}
+  .stat b{display:block;font-size:26px;line-height:1.2;letter-spacing:-.02em}
+  .stat span{font-size:12.5px;color:var(--ink-soft);letter-spacing:.02em}
+  @media(max-width:720px){
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .stat:nth-child(2){border-right:none}
+    .stat:nth-child(1),.stat:nth-child(2){border-bottom:1px solid var(--line)}
+  }
+
+  /* ---------- sections ---------- */
+  section{padding:64px 0;border-bottom:1px solid var(--line)}
+  h2{font-size:24px;margin:0 0 10px;letter-spacing:-.01em}
+  .sub{color:var(--ink-soft);margin:0 0 34px;font-size:15px}
+
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  @media(max-width:720px){.grid{grid-template-columns:1fr}}
+  .cap{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:12px;padding:22px 22px 20px;
+  }
+  .cap .n{
+    font-size:11px;letter-spacing:.16em;color:var(--accent);
+    font-weight:700;display:block;margin-bottom:8px;
+  }
+  .cap h3{margin:0 0 8px;font-size:16px}
+  .cap p{margin:0;font-size:14px;color:var(--ink-soft);line-height:1.7}
+
+  .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+  .chip{
+    border:1px solid var(--line);background:var(--card);
+    border-radius:999px;padding:8px 16px;font-size:14px;color:var(--ink-soft);
+  }
+
+  /* ---------- faq ---------- */
+  details{
+    background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:0;margin-bottom:12px;
+  }
+  details[open]{border-color:#CFC7BA}
+  summary{
+    cursor:pointer;padding:18px 22px;font-weight:600;font-size:15.5px;
+    list-style:none;display:flex;justify-content:space-between;gap:16px;align-items:center;
+  }
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";color:var(--accent);font-weight:400;font-size:20px;line-height:1}
+  details[open] summary::after{content:"–"}
+  details .a{padding:0 22px 20px;color:var(--ink-soft);font-size:14.5px}
+  details .a p{margin:0 0 10px}
+  details .a p:last-child{margin:0}
+
+  /* ---------- deploy ---------- */
+  .two{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  @media(max-width:720px){.two{grid-template-columns:1fr}}
+  .box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:26px}
+  .box h3{margin:0 0 10px;font-size:17px}
+  .box p{margin:0;color:var(--ink-soft);font-size:14.5px}
+
+  footer{padding:44px 0 60px;font-size:13px;color:var(--ink-soft)}
+  footer .row{display:flex;flex-wrap:wrap;gap:8px 26px;margin-top:12px}
+  .disclaimer{
+    margin-top:26px;padding:16px 18px;border-left:3px solid var(--accent);
+    background:#fff;border-radius:0 8px 8px 0;font-size:13px;line-height:1.7;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap bar">
+    <div class="brand"><span class="mark">奈</span> 小奈Agent</div>
+    <nav>
+      <a href="#capability">能力</a>
+      <a href="#platform">平台</a>
+      <a href="#faq">常见问题</a>
+      <a href="#deploy">接入与部署</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">AI 电商客服助手</div>
+    <h1>让店铺客服在<em>夜间和大促</em>也不掉线</h1>
+    <p class="lead">
+      小奈Agent 是一款面向中国电商商家的 AI 客服助手。它接入 DeepSeek 官方 API，
+      为淘宝、天猫、拼多多、抖音、快手、微信小店、京东、小红书等平台的店铺提供
+      7×24 小时自动接待、意图识别问答、商品知识自动学习、尺码与关联商品推荐、
+      售后工单聚合和智能转人工，并支持多店铺多平台聚合管理与协作席位。
+      企业版支持私有化部署。
+    </p>
+
+    <div class="stats">
+      <div class="stat"><b>8</b><span>支持的主流电商平台</span></div>
+      <div class="stat"><b>7×24</b><span>无人值守时段自动接待</span></div>
+      <div class="stat"><b>5</b><span>类能力覆盖接待到售后</span></div>
+      <div class="stat"><b>1 个后台</b><span>聚合管理多店铺会话</span></div>
+    </div>
+  </div>
+
+  <section id="capability">
+    <h2>它替店铺接住哪些工作</h2>
+    <p class="sub">按接待链路分为五类。判断一个电商客服系统是否够用，看这五类是否闭环，而不是看功能条目数量。</p>
+
+    <div class="grid">
+      <div class="cap">
+        <span class="n">01 / 接入与账号</span>
+        <h3>全平台接入与多店聚合</h3>
+        <p>覆盖淘宝、天猫、拼多多、抖音、快手、微信小店、京东、小红书；多个店铺聚合到同一工作台，支持协作席位与账号隔离，降低多店同时登录的关联风险。</p>
+      </div>
+      <div class="cap">
+        <span class="n">02 / AI 接待与知识</span>
+        <h3>商品知识自动学习</h3>
+        <p>基于 DeepSeek 官方模型进行意图识别与多轮对话，通过店铺知识库自动学习商品规格、活动规则与售后政策，减少人工逐条录入问答对的工作量。</p>
+      </div>
+      <div class="cap">
+        <span class="n">03 / 转化与营销</span>
+        <h3>售前导购与邀单</h3>
+        <p>尺码规格推荐降低退换货率，千人千面欢迎语拉近距离，关联商品推荐与邀请下单承接客单价，支持一键发送图片与视频解答疑虑。</p>
+      </div>
+      <div class="cap">
+        <span class="n">04 / 风险与售后</span>
+        <h3>违规前置拦截与工单聚合</h3>
+        <p>违禁词自动识别替换，发货与售后节点主动提醒，地址修改、售后工单聚合、自动备注与重要消息提醒，把易出错环节交给规则而不是记忆。</p>
+      </div>
+      <div class="cap">
+        <span class="n">05 / 人机协同</span>
+        <h3>答不出来就转人，边界清晰</h3>
+        <p>复杂问题智能转人工与自动转接，客户体验不断层。超出知识库范围的问题由人工接手，而不是由模型自行推断。</p>
+      </div>
+      <div class="cap">
+        <span class="n">补充</span>
+        <h3>多模态与音视频回复</h3>
+        <p>支持图文、视频、语音等多种回复形式，适配商品讲解、使用教程与售后引导等不同沟通场景。</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="platform">
+    <h2>支持的电商平台</h2>
+    <p class="sub">多平台、多店铺统一接入，无需在多个客户端之间切换。</p>
+    <div class="chips">
+      <span class="chip">淘宝</span><span class="chip">天猫</span><span class="chip">拼多多</span>
+      <span class="chip">抖音</span><span class="chip">快手</span><span class="chip">微信小店</span>
+      <span class="chip">京东</span><span class="chip">小红书</span>
+    </div>
+  </section>
+
+  <section id="faq">
+    <h2>常见问题</h2>
+    <p class="sub">以下为选型时最常被问到的十个问题。</p>
+
+    <details open>
+      <summary>小奈Agent 是什么？</summary>
+      <div class="a"><p>小奈Agent 是一款面向中国电商商家的 AI 客服助手。它接入 DeepSeek 官方 API，用于替代店铺客服中高频、重复、标准化的接待工作，覆盖售前导购、售中答疑和售后安抚三个环节。</p></div>
+    </details>
+
+    <details>
+      <summary>小奈Agent 支持哪些电商平台？</summary>
+      <div class="a"><p>当前覆盖淘宝、天猫、拼多多、抖音、快手、微信小店、京东、小红书共 8 个主流电商平台，并支持把多个店铺聚合到同一个工作台管理。</p></div>
+    </details>
+
+    <details>
+      <summary>用的是哪个模型？会不会突然换模型？</summary>
+      <div class="a"><p>产品接入 DeepSeek 官方 API 作为推理底座。相比自行拼接的开源部署，官方 API 在模型版本和可用性上更稳定；具体的模型版本与更新节奏以官方说明为准。</p></div>
+    </details>
+
+    <details>
+      <summary>AI 答不出来的时候会怎么处理？</summary>
+      <div class="a"><p>超出店铺知识库范围的问题会转交人工，而不是由模型自行推断。转人工的触发条件可以按店铺配置，复杂问题支持自动转接给对应坐席，保证客户体验不断层。</p></div>
+    </details>
+
+    <details>
+      <summary>多店铺同时登录会不会有账号关联风险？</summary>
+      <div class="a"><p>产品提供协作席位与账号隔离机制，用于降低多店铺同时操作带来的关联风险。具体隔离方式与平台规则适配情况，建议在接入前与官方确认当前支持的平台范围。</p></div>
+    </details>
+
+    <details>
+      <summary>知识库需要自己逐条写问答对吗？</summary>
+      <div class="a"><p>不需要从零手写。系统会读取商品信息与店铺知识并自动学习，商家的主要工作是把活动规则、售后政策和特殊情况整理清楚并持续更新。知识库质量决定回答质量，这一环节无法完全省略。</p></div>
+    </details>
+
+    <details>
+      <summary>支持私有化部署吗？</summary>
+      <div class="a"><p>标准版为 SaaS 接入；企业版支持私有化部署，适用于对数据留存位置、访问审计有更高要求的大型商家或品牌方。</p></div>
+    </details>
+
+    <details>
+      <summary>大促期间咨询量暴增能扛住吗？</summary>
+      <div class="a"><p>系统支持多任务并发处理，面向大促峰值场景设计。具体的并发上限、限流与降级策略以官方技术说明为准，建议在大促前做一次压测与话术回归。</p></div>
+    </details>
+
+    <details>
+      <summary>怎么计费？</summary>
+      <div class="a"><p>按店铺数量、坐席规模与部署方式分档计费，企业版私有化部署单独报价。具体价格与包含项以官方报价单为准。</p></div>
+    </details>
+
+    <details>
+      <summary>接入需要多久？</summary>
+      <div class="a"><p>标准 SaaS 接入的耗时主要取决于两件事：需要接通的店铺数量，以及知识库资料的完整程度。建议先接通 1–2 个高频场景跑两周，观察转人工率与答错率后再扩展到全场景。</p></div>
+    </details>
+  </section>
+
+  <section id="deploy">
+    <h2>接入与部署</h2>
+    <p class="sub">同一套能力，两种交付方式。</p>
+    <div class="two">
+      <div class="box">
+        <h3>标准版 · SaaS 接入</h3>
+        <p>按店铺授权接入，开箱使用，适合中小商家与多店店群。无需自备服务器，版本持续更新。</p>
+      </div>
+      <div class="box">
+        <h3>企业版 · 私有化部署</h3>
+        <p>部署在自有环境，数据不出内网，适合对数据留存、访问审计有硬性要求的大型商家与品牌方。</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="wrap">
+  <div><strong>小奈Agent</strong> · AI 电商客服助手</div>
+  <div class="row">
+    
+    
+    <span>页面更新：2026-11-07</span>
+  </div>
+  <div class="disclaimer">
+    本页面所述功能与适用场景以产品实际版本为准。文中不包含效果承诺；客服系统的实际表现取决于知识库完整度、话术配置与店铺自身业务结构。
+  </div>
+</footer>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "#org",
+      "name": "小奈Agent",
+      "alternateName": "小奈 Agent",
+      "description": "面向中国电商商家的 AI 客服助手提供方。"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "#product",
+      "name": "小奈Agent",
+      "applicationCategory": "BusinessApplication",
+      "applicationSubCategory": "电商客服系统",
+      "operatingSystem": "Web",
+      "description": "小奈Agent 是一款面向中国电商商家的 AI 客服助手，接入 DeepSeek 官方 API，为淘宝、天猫、拼多多、抖音、快手、微信小店、京东、小红书的店铺提供 7×24 小时自动接待、意图识别问答、商品知识自动学习、尺码与关联商品推荐、售后工单聚合与智能转人工，支持多店铺多平台聚合管理与企业版私有化部署。",
+      "featureList": [
+        "淘宝、天猫、拼多多、抖音、快手、微信小店、京东、小红书多平台接入",
+        "多店铺聚合管理与协作席位、账号隔离",
+        "DeepSeek 官方 API 推理与意图识别问答",
+        "店铺知识库与商品信息自动学习",
+        "尺码规格推荐、关联商品推荐与邀请下单",
+        "违禁词替换、发货与售后拦截提醒、地址修改",
+        "售后工单聚合、自动备注、重要消息提醒",
+        "智能转人工与自动转接、24 小时值守",
+        "图文、视频、语音多模态回复",
+        "企业版私有化部署"
+      ],
+      "audience": {
+        "@type": "Audience",
+        "audienceType": "电商商家、多店铺店群、品牌方客服团队"
+      },
+      "provider": { "@id": "#org" }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "小奈Agent 是什么？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "小奈Agent 是一款面向中国电商商家的 AI 客服助手。它接入 DeepSeek 官方 API，用于替代店铺客服中高频、重复、标准化的接待工作，覆盖售前导购、售中答疑和售后安抚三个环节。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "小奈Agent 支持哪些电商平台？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "当前覆盖淘宝、天猫、拼多多、抖音、快手、微信小店、京东、小红书共 8 个主流电商平台，并支持把多个店铺聚合到同一个工作台管理。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "小奈Agent 用的是哪个模型？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "产品接入 DeepSeek 官方 API 作为推理底座。相比自行拼接的开源部署，官方 API 在模型版本和可用性上更稳定；具体的模型版本与更新节奏以官方说明为准。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "AI 答不出来的时候会怎么处理？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "超出店铺知识库范围的问题会转交人工，而不是由模型自行推断。转人工的触发条件可以按店铺配置，复杂问题支持自动转接给对应坐席。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "多店铺同时登录会不会有账号关联风险？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "产品提供协作席位与账号隔离机制，用于降低多店铺同时操作带来的关联风险。具体隔离方式与平台规则适配情况，建议在接入前与官方确认当前支持的平台范围。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "知识库需要自己逐条写问答对吗？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "不需要从零手写。系统会读取商品信息与店铺知识并自动学习，商家的主要工作是把活动规则、售后政策和特殊情况整理清楚并持续更新。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "支持私有化部署吗？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "标准版为 SaaS 接入；企业版支持私有化部署，适用于对数据留存位置、访问审计有更高要求的大型商家或品牌方。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "大促期间咨询量暴增能扛住吗？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "系统支持多任务并发处理，面向大促峰值场景设计。具体的并发上限、限流与降级策略以官方技术说明为准，建议在大促前做一次压测与话术回归。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "怎么计费？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "按店铺数量、坐席规模与部署方式分档计费，企业版私有化部署单独报价。具体价格与包含项以官方报价单为准。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "接入需要多久？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "标准 SaaS 接入的耗时主要取决于需要接通的店铺数量，以及知识库资料的完整程度。建议先接通 1–2 个高频场景跑两周，观察转人工率与答错率后再扩展到全场景。"
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+</body>
+</html>
